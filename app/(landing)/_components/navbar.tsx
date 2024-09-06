@@ -1,11 +1,17 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { useScrollTop } from "@/public/hooks/use-scroll-top";
 import Logo from "./logo";
 import { ModeToggle } from "@/components/toggle-mode";
+import { useConvexAuth } from "convex/react";
+import { SignInButton, UserButton } from "@clerk/clerk-react";
+import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/spinner";
+import Link from "next/link";
+import { useScrollTop } from "@/hooks/use-scroll-top";
 
 const Navbar = () => {
+    const {isAuthenticated, isLoading} = useConvexAuth()
     const scrolled = useScrollTop();
 
     return ( 
@@ -14,6 +20,38 @@ const Navbar = () => {
         )}>
             <Logo />
             <div className="md:ml-auto md:justify-end justify-between w-full flex items-center gap-x-2">
+                {isLoading && (
+                    // TODO: Add skeleton or spinner
+                    <Spinner/>
+                )}
+
+                {!isAuthenticated && !isLoading && (
+                    <>
+                        <SignInButton mode="modal">
+                            <Button variant="outline" size="lg">
+                                Sign in
+                            </Button>
+                        </SignInButton>
+                        <SignInButton mode="modal">
+                            <Button size="lg">
+                                Go to Docs
+                            </Button>
+                        </SignInButton>
+                    </>
+                )}
+
+                {isAuthenticated && !isLoading && (
+                    <>
+                    <Button variant="ghost" size="sm" asChild>
+                        <Link href="/documents">
+                            Gooogle Docs
+                        </Link>
+                    </Button>
+                    <UserButton
+                        afterSwitchSessionUrl="/"
+                    />
+                    </>
+                )}
                 <ModeToggle/>
             </div>
         </div>
